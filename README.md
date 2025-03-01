@@ -1,4 +1,7 @@
+
 # Interneers Lab
+
+[![AGPL License](https://img.shields.io/badge/License-Rippling-FDB71C.svg)](https://www.rippling.com/)
 
 Welcome to the **Interneers Lab 2025** repository! This serves as a minimal starter kit for learning and experimenting with:
 - **Django** (Python)
@@ -425,7 +428,6 @@ Head over to the frontend README to check it out:
 - However, never commit secrets (API keys, passwords) directly. Use environment variables or .env files (excluded via .gitignore).
 
 ---
-
 
 
 
