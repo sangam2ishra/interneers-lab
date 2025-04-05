@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework_mongoengine",
+    "product",
 ]
 
 MIDDLEWARE = [
@@ -105,7 +108,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+# TIME_ZONE = "UTC"
+TIME_ZONE = 'Asia/Kolkata'
+
 
 USE_I18N = True
 
@@ -121,3 +126,12 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+
+from mongoengine import connect
+
+connect(db='product_db',
+        # host='mongodb://root:example@mongo:27017/product_db?authSource=admin',
+        # port=27017
+        )
