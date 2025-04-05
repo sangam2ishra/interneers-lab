@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.http import HttpResponse, JsonResponse
 
 def hello_world(request):
@@ -12,5 +12,6 @@ def hello_name(request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include('product.urls')),
     path('hello/', hello_name),
 ]
