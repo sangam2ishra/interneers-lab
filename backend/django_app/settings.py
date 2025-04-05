@@ -25,7 +25,7 @@ SECRET_KEY = "setup key"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*', 'testserver']
 
 
 # Application definition
@@ -127,6 +127,12 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'product.pagination.StandardResultsSetPagination',
+    'PAGE_SIZE': 10,
+    # ... other DRF settings ...
+}
 
 
 from mongoengine import connect
