@@ -26,6 +26,7 @@ class ProductCategoryAPITest(APITestCase):
     
     @classmethod
     def tearDownClass(cls):
+        # if i don't want frest db each time while testing, comment below 2 lines
         Product.drop_collection()
         ProductCategory.drop_collection()
         disconnect()
