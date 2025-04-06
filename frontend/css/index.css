@@ -73,10 +73,12 @@ header p{
     text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     padding: 1rem;
+    transition: transform 0.5s ease, background-color 3s ease;
 }
 
 .product-card:hover{
     transform: translateY(-5px);
+    background-color: lightblue;
 }
 
 .product-card img{
