@@ -44,16 +44,20 @@ nav a:hover {
 
 header{
     text-align: center;
-    margin: 2rem 0;
+    padding: 2rem;
+    background-color: #fff;
+    margin: 0 0;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
-
-header h1{
-    font-size: 2.5rem;
-    color: #2222;
+header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
 }
 
 header p{
-    color: #555;
+    color: #787d8c;
+    font-weight: bold;
 }
 
 #product-list{
