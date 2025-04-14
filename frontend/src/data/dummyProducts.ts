@@ -15,7 +15,8 @@ export const dummyProducts: Product[] = [
   {
     id: "2",
     name: "Mechanical Keyboard",
-    description: "High-quality, tactile keyboard perfect for typing and gaming.",
+    description:
+      "High-quality, tactile keyboard perfect for typing and gaming.",
     category: "Accessories",
     price: 79.99,
     brand: "KeyMasters",
@@ -33,6 +34,5 @@ export const dummyProducts: Product[] = [
     quantity: 25,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-  }
-]
-
+  },
+];

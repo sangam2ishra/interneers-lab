@@ -1,36 +1,77 @@
-// import React from "react";
-// import logo from "./logo.svg";
-// import "./App.scss";
+// src/App.tsx
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import BasePage from "./pages/BasePage";
+import HomePage from "./pages/HomePage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.tsx</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
+// Dummy components for additional pages
+const AboutPage = () => (
+  <div>
+    <h1>About</h1>
+    <p>About us content.</p>
+  </div>
+);
+const ContactPage = () => (
+  <div>
+    <h1>Contact</h1>
+    <p>Contact us content.</p>
+  </div>
+);
+const HelpPage = () => (
+  <div>
+    <h1>Help</h1>
+    <p>Help content.</p>
+  </div>
+);
 
-// export default App;
-import React from 'react';
-import ProductList from './components/ProductList';
-
-const App: React.FC=()=>{
-  return(<div>
-    <ProductList/>
-  </div>);
+const App: React.FC = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <BasePage>
+              <HomePage />
+            </BasePage>
+          }
+        />
+        <Route
+          path="/product/:id"
+          element={
+            <BasePage>
+              <ProductDetailPage />
+            </BasePage>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <BasePage>
+              <AboutPage />
+            </BasePage>
+          }
+        />
+        <Route
+          path="/contact"
+          element={
+            <BasePage>
+              <ContactPage />
+            </BasePage>
+          }
+        />
+        <Route
+          path="/help"
+          element={
+            <BasePage>
+              <HelpPage />
+            </BasePage>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
 };
 
 export default App;
