@@ -9,6 +9,7 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
   return (
     <div
+      style={{ cursor: "pointer" }}
       className="product-card"
       onClick={() => onClick && onClick(product.id as string)}
     >
