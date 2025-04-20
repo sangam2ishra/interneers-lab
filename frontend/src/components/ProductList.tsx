@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import ProductCard from "./ProductCard";
 import { dummyProducts } from "../data/dummyProducts";
 import { Product } from "../models/product";
+import LoadingSpinner from "./LoadingSpinner";
 
 const ProductList: React.FC = () => {
   const [products, setPorducts] = useState<Product[]>([]);
@@ -44,7 +45,7 @@ const ProductList: React.FC = () => {
     navigate(`/product/${id}`);
   };
 
-  if (loading) return <div> Loading products ...</div>;
+  if (loading) return <LoadingSpinner />;
   if (error) return <div style={{ color: "red" }}>Error: {error}</div>;
   return (
     <div>
