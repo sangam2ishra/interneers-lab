@@ -130,7 +130,7 @@ const ProductDetailPage: React.FC = () => {
       setIsEditing(false);
 
       //to get updated product
-      window.location.reload();
+      // window.location.reload();
     } catch (err: any) {
       setSaveError(err.message || "unknown error");
     } finally {
@@ -140,7 +140,6 @@ const ProductDetailPage: React.FC = () => {
 
   const handleCategoryUpdate = async () => {
     if (!newCategory || !id) return;
-    setCategoryError(null);
     try {
       const res = await fetch(
         `http://localhost:8000/api/categories/${newCategory}/add_product/`,
@@ -156,6 +155,7 @@ const ProductDetailPage: React.FC = () => {
           `Add failed: ${res.status} ${res.statusText} - ${text}}`,
         );
       }
+      setChangingCategory(false);
       window.location.reload();
     } catch (err: any) {
       setCategoryError(err.message || "Unknown error");

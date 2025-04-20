@@ -21,7 +21,7 @@ class ProductRepository:
             # it will return old data
 
             #if i want new data, i will have to re-fetch it like below
-            # product = Product.objects(id=product_id).first()
+            product = Product.objects(id=product_id).first()
         return product
 
     def delete_product(self, product_id):
