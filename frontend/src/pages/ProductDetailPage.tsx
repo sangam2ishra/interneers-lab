@@ -3,6 +3,7 @@ import React, { useState, useEffect, FormEvent } from "react";
 import { useParams, Link } from "react-router-dom";
 import { dummyProducts } from "../data/dummyProducts";
 import { Product } from "../models/product";
+import { ProductCategory } from "models/product_category";
 
 interface ProductFormData {
   name: string;
@@ -11,6 +12,7 @@ interface ProductFormData {
   brand: string;
   quantity: number;
 }
+
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
@@ -29,6 +31,13 @@ const ProductDetailPage: React.FC = () => {
   const [saving, setSaving] = useState<boolean>(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
+  // category change states
+  const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [changingCategory, setChangingCategory] = useState<boolean>(false);
+  const [newCategory, setNewCategory] = useState<string>("");
+  const [categoryError, setCategoryError] = useState<string | null>(null);
+
+  //Fetch product
   useEffect(() => {
     if (!id) {
       setError("No productID provided");
@@ -53,6 +62,22 @@ const ProductDetailPage: React.FC = () => {
     fetchProduct();
   }, [id]);
 
+  // Fetch Categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/categories/");
+        if (!res.ok) throw new Error(`${res.status}:${res.statusText}`);
+        const payload = await res.json();
+        setCategories(Array.isArray(payload.results) ? payload.results : []);
+      } catch (err: any) {
+        setCategoryError(err.message || "Unknown error");
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  //initialize form Data while entering editing mode
   useEffect(() => {
     if (product && isEditing) {
       setFormData({
@@ -113,6 +138,30 @@ const ProductDetailPage: React.FC = () => {
     }
   };
 
+  const handleCategoryUpdate = async () => {
+    if (!newCategory || !id) return;
+    setCategoryError(null);
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/categories/${newCategory}/add_product/`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ product_id: id }),
+        },
+      );
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(
+          `Add failed: ${res.status} ${res.statusText} - ${text}}`,
+        );
+      }
+      window.location.reload();
+    } catch (err: any) {
+      setCategoryError(err.message || "Unknown error");
+    }
+  };
+
   if (loading) {
     return <div>Loading Product...</div>;
   }
@@ -128,7 +177,8 @@ const ProductDetailPage: React.FC = () => {
         <>
           <h1>{product?.name}</h1>
           <p>
-            <strong>CategoryId:</strong> {product?.category}
+            <strong>Category: </strong>
+            {categories.find((cat) => cat.id == product?.category)?.title}
           </p>
           <p>{product?.description}</p>
           <p>
@@ -156,6 +206,65 @@ const ProductDetailPage: React.FC = () => {
             Edit
           </button>
           {/* Add any additional details as needed */}
+          <button
+            onClick={() => setChangingCategory(true)}
+            style={{
+              marginTop: "2rem",
+              padding: "1rem 2rem",
+              cursor: "pointer",
+              color: "white",
+              background: "#0066cc",
+              borderRadius: "10px",
+              marginLeft: "2rem",
+            }}
+          >
+            Change Category
+          </button>
+          {changingCategory && (
+            <div style={{ marginTop: "2rem" }}>
+              <label>
+                New Category:
+                <select
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                >
+                  <option value="" disabled>
+                    -- select category --
+                  </option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat?.title}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                onClick={handleCategoryUpdate}
+                style={{
+                  marginLeft: "1rem",
+                  padding: "0.4rem 1rem",
+                  background: "green",
+                  borderRadius: "8px",
+                  color: "white",
+                }}
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setChangingCategory(false)}
+                style={{
+                  marginLeft: "0.5rem",
+                  padding: "0.4rem 1rem",
+                  background: "#ccc",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              {categoryError && <p style={{ color: "red" }}>{categoryError}</p>}
+            </div>
+          )}
         </>
       ) : (
         <form
