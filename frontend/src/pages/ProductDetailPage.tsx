@@ -4,6 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import { dummyProducts } from "../data/dummyProducts";
 import { Product } from "../models/product";
 import { ProductCategory } from "models/product_category";
+import LoadingSpinner from "components/LoadingSpinner";
 
 interface ProductFormData {
   name: string;
@@ -163,7 +164,7 @@ const ProductDetailPage: React.FC = () => {
   };
 
   if (loading) {
-    return <div>Loading Product...</div>;
+    return <LoadingSpinner />;
   }
   if (error) {
     return <div style={{ color: "Red" }}>Error:{error}</div>;
