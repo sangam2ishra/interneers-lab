@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import BasePage from "./pages/BasePage";
 import HomePage from "./pages/HomePage";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import CategoryList from "./components/CategoryList";
+import CategoryDetailPage from "pages/CategoryDetailPage";
 
 // Dummy components for additional pages
 const AboutPage = () => (
@@ -42,6 +44,22 @@ const App: React.FC = () => {
           element={
             <BasePage>
               <ProductDetailPage />
+            </BasePage>
+          }
+        />
+        <Route
+          path="/categories"
+          element={
+            <BasePage>
+              <CategoryList />
+            </BasePage>
+          }
+        />
+        <Route
+          path="/categories/:id"
+          element={
+            <BasePage>
+              <CategoryDetailPage />
             </BasePage>
           }
         />

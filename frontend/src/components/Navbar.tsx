@@ -32,6 +32,15 @@ const Navbar: React.FC = () => {
         Home
       </NavLink>
       <NavLink
+        to="/categories"
+        style={({ isActive }) =>
+          isActive ? { ...linkStyle, ...activeLinkStyle } : linkStyle
+        }
+        end
+      >
+        Categories
+      </NavLink>
+      <NavLink
         to="/about"
         style={({ isActive }) =>
           isActive ? { ...linkStyle, ...activeLinkStyle } : linkStyle
@@ -49,7 +58,7 @@ const Navbar: React.FC = () => {
       </NavLink>
       <NavLink
         to="/help"
-        style={(isActive) =>
+        style={({ isActive }) =>
           isActive ? { ...linkStyle, ...activeLinkStyle } : linkStyle
         }
       >

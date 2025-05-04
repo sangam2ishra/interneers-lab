@@ -1,32 +1,28 @@
 // src/pages/ProductDetailPage.tsx
 import React, { useState, useEffect, FormEvent } from "react";
-import { useParams, Link, Navigate } from "react-router-dom";
+import { useParams, Link, useViewTransitionState } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { dummyProducts } from "../data/dummyProducts";
 import { Product } from "../models/product";
 import { ProductCategory } from "models/product_category";
 import LoadingSpinner from "components/LoadingSpinner";
+import ProductCard from "components/ProductCard";
 
-interface ProductFormData {
-  name: string;
+interface CategoryFormData {
+  title: string;
   description: string;
-  price: number;
-  brand: string;
-  quantity: number;
 }
 
-const ProductDetailPage: React.FC = () => {
+const CategoryDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<Product | null>(null);
+  const [category, setCategory] = useState<ProductCategory | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [formData, setFormData] = useState<ProductFormData>({
-    name: "",
+  const [formData, setFormData] = useState<CategoryFormData>({
+    title: "",
     description: "",
-    price: 0,
-    brand: "",
-    quantity: 0,
   });
 
   const [saving, setSaving] = useState<boolean>(false);
@@ -38,58 +34,62 @@ const ProductDetailPage: React.FC = () => {
   const [newCategory, setNewCategory] = useState<string>("");
   const [categoryError, setCategoryError] = useState<string | null>(null);
 
-  //Fetch product
+  // products in the current category
+  const [products, setProducts] = useState<Product[]>([]);
+
+  const navigate = useNavigate();
+
+  //Fetch category
   useEffect(() => {
     if (!id) {
       setError("No productID provided");
       setLoading(false);
       return;
     }
-    const fetchProduct = async () => {
+    const fetchCategory = async () => {
       try {
-        console.log(id);
-        const res = await fetch(`http://localhost:8000/api/products/${id}`);
+        const res = await fetch(`http://localhost:8000/api/categories/${id}`);
         if (!res.ok) {
           throw new Error(`Error: ${res.status}: ${res.statusText}`);
         }
-        const data: Product = await res.json();
-        setProduct(data);
+        const data: ProductCategory = await res.json();
+        setCategory(data);
       } catch (err: any) {
         setError(err.message || "Unknown error");
       } finally {
         setLoading(false);
       }
     };
-    fetchProduct();
+    fetchCategory();
   }, [id]);
 
-  // Fetch Categories
+  //   Fetch Products of the current category
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/categories/");
+        const res = await fetch(
+          `http://localhost:8000/api/categories/${id}/products`,
+        );
         if (!res.ok) throw new Error(`${res.status}:${res.statusText}`);
         const payload = await res.json();
-        setCategories(Array.isArray(payload.results) ? payload.results : []);
+        setProducts(payload);
+        setProducts(Array.isArray(payload) ? payload : []);
       } catch (err: any) {
         setCategoryError(err.message || "Unknown error");
       }
     };
-    fetchCategories();
+    fetchProducts();
   }, []);
 
   //initialize form Data while entering editing mode
   useEffect(() => {
-    if (product && isEditing) {
+    if (category && isEditing) {
       setFormData({
-        name: product?.name,
-        description: product?.description,
-        price: product?.price,
-        brand: product?.brand || "",
-        quantity: product.quantity ?? 0,
+        title: category?.title || "",
+        description: category?.description || "",
       });
     }
-  }, [isEditing, product]);
+  }, [isEditing, category]);
 
   const handleEditToggle = () => {
     setSaveError(null);
@@ -99,11 +99,10 @@ const ProductDetailPage: React.FC = () => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    console.log(e);
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData((prev: any) => ({
       ...prev,
-      [name]: name === "price" || name === "quantity" ? Number(value) : value,
+      [name]: value,
     }));
   };
 
@@ -113,7 +112,7 @@ const ProductDetailPage: React.FC = () => {
     setSaveError(null);
 
     try {
-      const res = await fetch(`http://localhost:8000/api/products/${id}/`, {
+      const res = await fetch(`http://localhost:8000/api/categories/${id}/`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -126,8 +125,8 @@ const ProductDetailPage: React.FC = () => {
         );
       }
 
-      const updated: Product = await res.json();
-      setProduct(updated);
+      const updated: ProductCategory = await res.json();
+      setCategory(updated);
       setIsEditing(false);
 
       //to get updated product
@@ -169,32 +168,19 @@ const ProductDetailPage: React.FC = () => {
   if (error) {
     return <div style={{ color: "Red" }}>Error:{error}</div>;
   }
-  if (!product) return <div>Product not found.</div>;
+  if (!category) return <div>Category not found.</div>;
 
   return (
     <div style={{ padding: "20px", maxWidth: "600px" }}>
-      <Link to="/">← Back to Products</Link>
+      <Link to="/categories">← Back to Categories</Link>
       {!isEditing ? (
         <>
-          <h1>{product?.name}</h1>
+          <h1>{category?.title}</h1>
           <p>
             <strong>Category: </strong>
-            <Link to={`/categories/${product.category}`}>
-              {categories.find((cat) => cat.id == product?.category)?.title}
-            </Link>
+            {category.title}
           </p>
-          <p>{product?.description}</p>
-          <p>
-            <strong>Price:</strong> Rs. {product?.price.toFixed(2)}
-          </p>
-          {product?.brand && (
-            <p>
-              <strong>Brand:</strong> {product?.brand}
-            </p>
-          )}
-          <p>
-            <strong>Quantity:</strong> {product?.quantity}
-          </p>
+          <p>{category?.description}</p>
           <button
             onClick={handleEditToggle}
             style={{
@@ -209,65 +195,6 @@ const ProductDetailPage: React.FC = () => {
             Edit
           </button>
           {/* Add any additional details as needed */}
-          <button
-            onClick={() => setChangingCategory(true)}
-            style={{
-              marginTop: "2rem",
-              padding: "1rem 2rem",
-              cursor: "pointer",
-              color: "white",
-              background: "#0066cc",
-              borderRadius: "10px",
-              marginLeft: "2rem",
-            }}
-          >
-            Change Category
-          </button>
-          {changingCategory && (
-            <div style={{ marginTop: "2rem" }}>
-              <label>
-                New Category:
-                <select
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                >
-                  <option value="" disabled>
-                    -- select category --
-                  </option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat?.title}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                onClick={handleCategoryUpdate}
-                style={{
-                  marginLeft: "1rem",
-                  padding: "0.4rem 1rem",
-                  background: "green",
-                  borderRadius: "8px",
-                  color: "white",
-                }}
-              >
-                Save
-              </button>
-              <button
-                onClick={() => setChangingCategory(false)}
-                style={{
-                  marginLeft: "0.5rem",
-                  padding: "0.4rem 1rem",
-                  background: "#ccc",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-              {categoryError && <p style={{ color: "red" }}>{categoryError}</p>}
-            </div>
-          )}
         </>
       ) : (
         <form
@@ -278,10 +205,10 @@ const ProductDetailPage: React.FC = () => {
           {saveError && <div style={{ color: "red" }}>{saveError}</div>}
 
           <label>
-            Name
+            Title
             <input
-              name="name"
-              value={formData.name}
+              name="title"
+              value={formData.title}
               onChange={handleChange}
               required
             />
@@ -298,37 +225,6 @@ const ProductDetailPage: React.FC = () => {
             />
           </label>
 
-          <label>
-            Price
-            <input
-              name="price"
-              type="number"
-              value={formData.price}
-              onChange={handleChange}
-              step="0.01"
-              required
-            />
-          </label>
-
-          <label>
-            Brand
-            <input
-              name="brand"
-              value={formData.brand}
-              onChange={handleChange}
-            />
-          </label>
-
-          <label>
-            Quantity
-            <input
-              name="quantity"
-              type="number"
-              value={formData.quantity}
-              onChange={handleChange}
-              required
-            />
-          </label>
           <div style={{ display: "flex", gap: "2rem", marginTop: "1rem" }}>
             <button type="submit" disabled={saving}>
               {saving ? "Saving..." : "Save"}
@@ -339,8 +235,19 @@ const ProductDetailPage: React.FC = () => {
           </div>
         </form>
       )}
+      <div style={{ marginTop: "3rem" }}>
+        <h1>Products List for this Category</h1>
+      </div>
+      {products.map((product: Product) => (
+        <div key={product.id} style={{ marginTop: "2rem" }}>
+          <ProductCard
+            product={product}
+            onClick={() => navigate(`/product/${product.id}`)}
+          />
+        </div>
+      ))}
     </div>
   );
 };
 
-export default ProductDetailPage;
+export default CategoryDetailPage;
